@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-
+from vectorDB import save_to_chroma
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def chunkText(text: str, chunk_size: int =400):
@@ -13,10 +13,6 @@ def chunkText(text: str, chunk_size: int =400):
 
     return chunks
 
-def convert_chunks_to_embeddings(chunks):
-    embeddings = model.encode(chunks)
+def to_embeddings(text):
+    return model.encode(text)
 
-def convert_question_to_embeddings(question):
-    embeddings = model.encode(question)
-
-def save_to_vector_db(embeddings):
