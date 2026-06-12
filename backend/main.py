@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from embeddingsConversion import chunkText, to_embeddings
 from vectorDB import save_to_chroma, collection, clear_collection
@@ -12,6 +13,13 @@ class IngestRequest(BaseModel):
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def root():
     return {"Hello": "World"}
@@ -24,6 +32,10 @@ def ingest(req: IngestRequest):
     save_to_chroma(embeddings, chunks)
     return {"chunks_ingested": len(chunks)}
 
+@app.get("/count")
+def count():
+    return {"documents": collection.count()}
+
 @app.post("/ask")
 def ask(ask: AskRequest):
     question_embedding = to_embeddings(ask.question)
@@ -33,9 +45,16 @@ def ask(ask: AskRequest):
         n_results=3
     )
 
-    # Build prompt from search results
-    context = "\n\n".join(results["documents"][0])
-    prompt = f"""You are a helpful assistant. Use the following context to answer the question.
+    documents = results.get("documents", [[]])[0]
+    if not documents:
+        prompt = f"""You are a helpful assistant. Answer the following question based on your own knowledge.
+
+Question: {ask.question}
+
+Answer:"""
+    else:
+        context = "\n\n".join(documents)
+        prompt = f"""You are a helpful assistant. Use the following context to answer the question.
 
 Context:
 {context}
@@ -46,7 +65,7 @@ Answer:"""
 
     # Get LLM response
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 

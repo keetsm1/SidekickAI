@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
   "name": "SidekickAI",
-  "version": "1.0.0",
-  "permissions": ["activeTab"],
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ]
+  "version": "1.0",
+  "description": "Ask questions about any page",
+
+  "action": {
+    "default_popup": "./popup.html"
+  },
+
+  "permissions": ["activeTab", "scripting"]
 }
