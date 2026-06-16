@@ -4,9 +4,11 @@
   "version": "1.0",
   "description": "Ask questions about any page",
 
-  "action": {
-    "default_popup": "./popup.html"
+  "action": {},
+
+  "background": {
+    "service_worker": "./background.js"
   },
 
-  "permissions": ["activeTab", "scripting"]
+  "permissions": ["activeTab", "scripting", "windows", "storage"]
 }

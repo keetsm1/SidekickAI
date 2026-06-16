@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-gemini_key = os.getenv("GEMINI_KEY")
+default_key = os.getenv("GEMINI_KEY")
 
-client = genai.Client(api_key=gemini_key)
+def get_client(api_key=None):
+    key = api_key if api_key else default_key
+    return genai.Client(api_key=key)
+
+client = get_client()
